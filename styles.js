@@ -10,9 +10,9 @@ body {
     background: white;
     width: 60%;
     margin: 50px auto;
-    padding: 30px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
 button {
@@ -38,6 +38,7 @@ button {
     margin: 5px;
     background: #ddd;
     border: 1px solid #bbb;
+    font-size: 18px;
 }
 
 .selected {
@@ -45,24 +46,24 @@ button {
     background-color: #b3e0ff !important;
 }
 
-/* Borders */
-.red-border { 
-    border: 3px solid red; 
-    padding: 5px; 
-    display: inline-block; 
-    margin-top: 10px; 
+/* Borders for special messages */
+#timeUpMessage {
+    font-weight: bold;
+    color: navy;
+    border: 2px solid red;
+    padding: 10px;
+    display: inline-block;
 }
 
-.blue-border { 
-    border: 3px solid blue; 
-    padding: 5px; 
-    display: inline-block; 
-    margin-top: 10px; 
+#feedback {
+    font-weight: bold;
+    border: 2px solid blue;
+    padding: 10px;
+    display: inline-block;
 }
 
-.exit-border { 
-    border: 3px solid green; 
-    padding: 10px; 
-    display: inline-block; 
-    margin-top: 10px; 
+#result {
+    border: 2px solid green;
+    padding: 15px;
+    margin-top: 20px;
 }
