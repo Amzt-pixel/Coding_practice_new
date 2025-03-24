@@ -1,83 +1,90 @@
 let questions = [];
 let currentQuestion = 0;
-let correctAnswers = 0;
+let score = 0;
 let wrongAnswers = 0;
 let attempted = 0;
 let selectedAnswer = null;
-let totalQuestions;
-let startTime;
+let timeLeft;
+let extraTime = 0;
 let timerRunning = false;
+let testStartTime;
 
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLM"; 
+const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLM"; // Custom looping system
 
 function startTest() {
-    let numQuestions = document.getElementById("numQuestions").value;
-    let upperLimit = document.getElementById("upperLimit").value;
-    let setMinutes = document.getElementById("setTimer").value;
+    let numQuestions = parseInt(document.getElementById("numQuestions").value);
+    let upperLimit = parseInt(document.getElementById("upperLimit").value);
+    let setMinutes = parseInt(document.getElementById("setTimer").value);
 
-    if (numQuestions < 1 || upperLimit >= 14 || setMinutes < 1) {
+    if (numQuestions < 1 || upperLimit < 1 || upperLimit >= 14 || setMinutes < 1) {
         alert("Enter valid values!");
         return;
     }
 
-    totalQuestions = parseInt(numQuestions);
-    startTime = new Date();
-    generateQuestions(totalQuestions, parseInt(upperLimit));
+    timeLeft = setMinutes * 60;
+    testStartTime = new Date(); // Start tracking time
+
+    generateQuestions(numQuestions, upperLimit);
 
     document.getElementById("setup").style.display = "none";
     document.getElementById("test").style.display = "block";
 
-    startTimer(setMinutes);
+    startTimer();
     loadQuestion();
 }
 
-function startTimer(minutes) {
-    let timeLeft = minutes * 60;
-    let timerElement = document.getElementById("timer");
-
+function startTimer() {
     timerRunning = true;
     let timerInterval = setInterval(() => {
-        let min = Math.floor(timeLeft / 60);
-        let sec = timeLeft % 60;
-        document.getElementById("timeLeft").innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        document.getElementById("timeLeft").innerText = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
         if (timeLeft > 0) {
             timeLeft--;
         } else {
             if (timerRunning) {
-                let message = document.getElementById("timeUpMessage");
-                message.innerText = "Time up! Test continues until all questions are attempted.";
-                message.classList.add("red-border");
-                timerElement.classList.add("red-border");
+                document.getElementById("timeUpMessage").innerText = 
+                    `Time up! You attempted ${attempted} questions till now.`;
                 timerRunning = false;
             }
+            extraTime++;
         }
     }, 1000);
 }
 
 function generateQuestions(num, upperLimit) {
     questions = [];
-    for (let i = 0; i < num; i++) {
-        let letter = alphabet[Math.floor(Math.random() * 26)];
+    while (questions.length < num) {
+        let letter = alphabet[Math.floor(Math.random() * 39)];
         let num = Math.floor(Math.random() * upperLimit) + 1;
-        let operation = Math.random() < 0.5 ? "+" : "-";
-        let answerIndex;
+        let isAddition = Math.random() < 0.5;
 
-        if (operation === "+") {
+        let answerIndex;
+        if (isAddition) {
             answerIndex = alphabet.indexOf(letter) + num;
         } else {
-            answerIndex = alphabet.indexOf(letter) - num;
-            if (answerIndex < 0) answerIndex += 39;
+            let originalIndex = alphabet.indexOf(letter);
+            answerIndex = (originalIndex >= 26) ? originalIndex - num : originalIndex + 13 - num;
         }
 
-        let answer = alphabet[answerIndex];
-        questions.push({ question: `${letter} ${operation} ${num} = ?`, answer });
+        if (answerIndex >= 0 && answerIndex < 39) {
+            let answer = alphabet[answerIndex];
+            let operation = isAddition ? "+" : "-";
+            questions.push({ question: `${letter} ${operation} ${num} = ?`, answer });
+        }
     }
 }
 
 function loadQuestion() {
+    if (attempted >= parseInt(document.getElementById("numQuestions").value)) {
+        submitTest();
+        return;
+    }
+
     let q = questions[currentQuestion];
-    document.getElementById("questionNumber").innerText = `Question ${currentQuestion + 1} of ${totalQuestions}`;
+    document.getElementById("questionNumber").innerText = `Question ${attempted + 1}`;
     document.getElementById("question").innerText = q.question;
     document.getElementById("options").innerHTML = "";
 
@@ -92,24 +99,6 @@ function loadQuestion() {
     });
 
     document.getElementById("feedback").innerText = "";
-    document.getElementById("feedback").classList.remove("blue-border");
-}
-
-function generateWrongOptions(correct) {
-    let options = [];
-    while (options.length < 3) {
-        let rand = alphabet[Math.floor(Math.random() * 26)];
-        if (!options.includes(rand) && rand !== correct) options.push(rand);
-    }
-    return options;
-}
-
-function selectOption(button, answer) {
-    document.querySelectorAll("#options button").forEach(btn => {
-        btn.classList.remove("selected");
-    });
-    button.classList.add("selected");
-    selectedAnswer = answer;
 }
 
 function saveAnswer() {
@@ -117,45 +106,19 @@ function saveAnswer() {
 
     attempted++;
     let correctAnswer = questions[currentQuestion].answer;
-    let feedback = document.getElementById("feedback");
 
     if (selectedAnswer === correctAnswer) {
-        feedback.innerText = "Very Good! Your answer is correct!";
-        feedback.style.color = "green";
-        correctAnswers++;
+        document.getElementById("feedback").innerText = "Correct!";
+        score++;
     } else {
-        feedback.innerText = `Oops! That was wrong! Correct answer: ${correctAnswer}`;
-        feedback.style.color = "red";
+        document.getElementById("feedback").innerText = `Wrong! Correct answer: ${correctAnswer}`;
         wrongAnswers++;
-    }
-
-    feedback.classList.add("blue-border");
-
-    // Disable further changes
-    document.querySelectorAll("#options button").forEach(btn => btn.onclick = null);
-}
-
-function nextQuestion() {
-    if (currentQuestion + 1 < totalQuestions) {
-        currentQuestion++;
-        loadQuestion();
-    } else {
-        submitTest();
     }
 }
 
 function submitTest() {
     document.getElementById("test").style.display = "none";
     document.getElementById("result").style.display = "block";
-
-    let timeTaken = ((new Date()) - startTime) / 1000;
-    let minutes = Math.floor(timeTaken / 60);
-    let seconds = Math.floor(timeTaken % 60);
-
-    document.getElementById("score").innerText = `Correct: ${correctAnswers}`;
-    document.getElementById("wrong").innerText = `Wrong: ${wrongAnswers}`;
-    document.getElementById("unattempted").innerText = `Unattempted: ${totalQuestions - attempted}`;
-    document.getElementById("timeTaken").innerText = `Total Time Taken: ${minutes} min ${seconds} sec`;
-
-    document.getElementById("result").classList.add("exit-border");
+    document.getElementById("score").innerText = `Correct: ${score}`;
+    document.getElementById("wrongAnswers").innerText = `Wrong: ${wrongAnswers}`;
 }
