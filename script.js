@@ -54,10 +54,25 @@ function startTimer() {
 function generateQuestions(num, upperLimit) {
     questions = [];
     for (let i = 0; i < num; i++) {
-        let letter = alphabet[Math.floor(Math.random() * 26)];
-        let num = Math.floor(Math.random() * upperLimit) + 1;
-        let answer = alphabet[alphabet.indexOf(letter) + num];
-        questions.push({ question: `${letter} + ${num} = ?`, answer });
+        let letterIndex = Math.floor(Math.random() * 26); // Random index from A-Z
+        let letter = alphabet[letterIndex];
+        let number = Math.floor(Math.random() * upperLimit) + 1;
+        let isAddition = Math.random() < 0.5; // 50% chance for addition or subtraction
+
+        let answer;
+        let questionText;
+
+        if (isAddition || letterIndex - number < 0) {
+            // Addition or invalid subtraction case
+            answer = alphabet[letterIndex + number];
+            questionText = `${letter} + ${number} = ?`;
+        } else {
+            // Valid subtraction case
+            answer = alphabet[letterIndex - number];
+            questionText = `${letter} - ${number} = ?`;
+        }
+
+        questions.push({ question: questionText, answer });
     }
 }
 
