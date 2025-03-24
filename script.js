@@ -33,7 +33,7 @@ function startTest() {
 
 function startTimer() {
     timerRunning = true;
-    setInterval(() => {
+    let timerInterval = setInterval(() => {
         let minutes = Math.floor(timeLeft / 60);
         let seconds = timeLeft % 60;
         document.getElementById("timeLeft").innerText = 
@@ -45,7 +45,9 @@ function startTimer() {
             if (timerRunning) {
                 document.getElementById("timeUpMessage").innerText = 
                     `Time up! You attempted ${attempted} questions till now. Practice more, you will do better.`;
+                document.getElementById("timeUpMessage").style.color = "navy"; // Navy Blue message
                 timerRunning = false;
+                submitTest();
             }
         }
     }, 1000);
@@ -54,21 +56,31 @@ function startTimer() {
 function generateQuestions(num, upperLimit) {
     questions = [];
     for (let i = 0; i < num; i++) {
-        let letterIndex = Math.floor(Math.random() * 26); // Random index from A-Z
+        let letterIndex = Math.floor(Math.random() * 39);
         let letter = alphabet[letterIndex];
         let number = Math.floor(Math.random() * upperLimit) + 1;
-        let isAddition = Math.random() < 0.5; // 50% chance for addition or subtraction
+        let isAddition = Math.random() < 0.5;
 
         let answer;
         let questionText;
 
-        if (isAddition || letterIndex - number < 0) {
-            // Addition or invalid subtraction case
+        if (isAddition) {
             answer = alphabet[letterIndex + number];
             questionText = `${letter} + ${number} = ?`;
         } else {
-            // Valid subtraction case
-            answer = alphabet[letterIndex - number];
+            let adjustedIndex = letterIndex;
+            if (letterIndex < number) {
+                let alternativeIndex = letterIndex + 26;
+                if (alternativeIndex >= number) {
+                    adjustedIndex = alternativeIndex;
+                } else {
+                    answer = alphabet[letterIndex + number];
+                    questionText = `${letter} + ${number} = ?`;
+                    questions.push({ question: questionText, answer });
+                    continue;
+                }
+            }
+            answer = alphabet[adjustedIndex - number];
             questionText = `${letter} - ${number} = ?`;
         }
 
@@ -98,7 +110,7 @@ function loadQuestion() {
 function generateWrongOptions(correct) {
     let options = [];
     while (options.length < 3) {
-        let rand = alphabet[Math.floor(Math.random() * 26)];
+        let rand = alphabet[Math.floor(Math.random() * 39)];
         if (!options.includes(rand) && rand !== correct) options.push(rand);
     }
     return options;
@@ -118,18 +130,28 @@ function saveAnswer() {
 
     if (selectedAnswer === correctAnswer) {
         document.getElementById("feedback").innerText = "Very Good! Your answer is correct!";
+        document.getElementById("feedback").style.color = "green"; // Green for correct
+        score++;
     } else {
         document.getElementById("feedback").innerText = `Oops! That was wrong! Correct answer: ${correctAnswer}`;
+        document.getElementById("feedback").style.color = "red"; // Red for wrong
         wrongAnswers++;
     }
 
     document.querySelectorAll("#options button").forEach(btn => btn.disabled = true);
+
+    if (attempted === questions.length) {
+        submitTest();
+    }
 }
 
 function nextQuestion() {
     currentQuestion++;
-    if (currentQuestion < questions.length) loadQuestion();
-    else submitTest();
+    if (currentQuestion < questions.length) {
+        loadQuestion();
+    } else {
+        submitTest();
+    }
 }
 
 function submitTest() {
