@@ -8,20 +8,28 @@ body {
 
 .container {
     background: white;
-    width: 50%;
+    width: 60%; /* Increased width */
     margin: 50px auto;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    padding: 30px; /* Increased padding */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+h1, h2 {
+    font-size: 28px; /* Increased text size */
+}
+
+p {
+    font-size: 20px; /* Increased general paragraph text */
 }
 
 button {
-    padding: 10px 15px;
-    margin: 10px;
+    padding: 15px 20px; /* Increased button size */
+    margin: 12px;
     cursor: pointer;
     border: none;
-    font-size: 16px;
-    border-radius: 5px;
+    font-size: 18px; /* Increased button text size */
+    border-radius: 8px;
 }
 
 .start-btn { background-color: #4CAF50; color: white; }
@@ -30,17 +38,38 @@ button {
 .submit-btn { background-color: #f44336; color: white; }
 .restart-btn { background-color: #795548; color: white; }
 
+input {
+    font-size: 18px; /* Increased input field text size */
+    padding: 10px;
+    width: 100px; /* Increased input field size */
+    text-align: center;
+}
+
 #options button {
     display: block;
     width: 100%;
     text-align: left;
-    padding: 10px;
-    margin: 5px;
+    padding: 15px; /* Increased option button padding */
+    margin: 8px 0;
     background: #ddd;
-    border: 1px solid #bbb;
+    border: 2px solid #bbb;
+    font-size: 20px; /* Increased option button text size */
+    border-radius: 6px;
 }
 
 .selected {
     font-weight: bold;
     background-color: #b3e0ff !important;
+}
+
+#timer {
+    font-size: 22px; /* Increased timer font size */
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#feedback {
+    font-size: 22px; /* Increased feedback text size */
+    font-weight: bold;
+    margin-top: 15px;
 }
